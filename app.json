@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Draft Tracker",
+    "slug": "draft-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#f6f3e8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.drafttracker.mobile"
+    },
+    "android": {
+      "package": "com.drafttracker.mobile"
+    },
+    "extra": {
+      "offlineOnly": true
+    }
+  }
+}
