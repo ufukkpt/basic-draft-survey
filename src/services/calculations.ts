@@ -6,65 +6,82 @@ export const round = (value: number, digits = 2) => {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
 };
+export const calculateDraftAtPerpendicular = (
+  meanDraft: number,
+  signedOffset: number,
+  lbp: number,
+  trim: number,
+  type: "FP" | "AP"
+) => {
+  // Forward draft mark: + value = abaft FP, - value = forward of FP
+  // Aft draft mark: + value = forward of AP, - value = abaft AP
+  if (type === "FP") {
+    return meanDraft - (signedOffset / lbp) * trim;
+  } else {
+    return meanDraft + (signedOffset / lbp) * trim;
+  }
+};
+
 export const calculateCorrectedDrafts = (
   input: SurveyInput,
   vessel: Vessel
 ) => {
-  const forwardMean =
-    (input.forwardPort + input.forwardStarboard) / 2;
-
-  const aftMean =
-    (input.aftPort + input.aftStarboard) / 2;
-
+  const forwardMean = (input.forwardPort + input.forwardStarboard) / 2;
+  const aftMean = (input.aftPort + input.aftStarboard) / 2;
   const trim = aftMean - forwardMean;
 
-  const correctedForwardDraft =
-    forwardMean -
-    (vessel.forwardDraftMarkFromFP / vessel.lbp) * trim;
+  const correctedForwardDraft = calculateDraftAtPerpendicular(
+    forwardMean,
+    vessel.forwardDraftMarkFromFP,
+    vessel.lbp,
+    trim,
+    "FP"
+  );
 
-  const correctedAftDraft =
-    aftMean +
-    (vessel.aftDraftMarkFromAP / vessel.lbp) * trim;
+  const correctedAftDraft = calculateDraftAtPerpendicular(
+    aftMean,
+    vessel.aftDraftMarkFromAP,
+    vessel.lbp,
+    trim,
+    "AP"
+  );
 
   return {
     correctedForwardDraft: round(correctedForwardDraft, 3),
     correctedAftDraft: round(correctedAftDraft, 3),
-    trim: round(trim, 3)
+    trim: round(trim, 3),
   };
 };
+
 export const calculateMeanDraft = (
   input: SurveyInput,
   vessel?: Vessel
 ) => {
-  const forwardMean =
-    (input.forwardPort + input.forwardStarboard) / 2;
+  const forwardMean = (input.forwardPort + input.forwardStarboard) / 2;
+  const midshipMean = (input.midshipPort + input.midshipStarboard) / 2;
+  const aftMean = (input.aftPort + input.aftStarboard) / 2;
 
-  const midshipMean =
-    (input.midshipPort + input.midshipStarboard) / 2;
-
-  const aftMean =
-    (input.aftPort + input.aftStarboard) / 2;
-
-  if (
-    !vessel ||
-    !vessel.lbp ||
-    vessel.lbp <= 0
-  ) {
-    return round(
-      (forwardMean + 6 * midshipMean + aftMean) / 8,
-      3
-    );
+  if (!vessel || !vessel.lbp || vessel.lbp <= 0) {
+    return round((forwardMean + 6 * midshipMean + aftMean) / 8, 3);
   }
 
   const trim = aftMean - forwardMean;
 
-  const correctedForward =
-    forwardMean -
-    (vessel.forwardDraftMarkFromFP / vessel.lbp) * trim;
+  const correctedForward = calculateDraftAtPerpendicular(
+    forwardMean,
+    vessel.forwardDraftMarkFromFP,
+    vessel.lbp,
+    trim,
+    "FP"
+  );
 
-  const correctedAft =
-    aftMean +
-    (vessel.aftDraftMarkFromAP / vessel.lbp) * trim;
+  const correctedAft = calculateDraftAtPerpendicular(
+    aftMean,
+    vessel.aftDraftMarkFromAP,
+    vessel.lbp,
+    trim,
+    "AP"
+  );
 
   return round(
     (correctedForward + 6 * midshipMean + correctedAft) / 8,
@@ -73,8 +90,10 @@ export const calculateMeanDraft = (
 };
 export const interpolateDisplacement = (meanDraftM: number, table: HydrostaticEntry[]) => {
   const ordered = [...table].sort((a, b) => a.draftM - b.draftM);
-  if (ordered.length === 0) {
-    return 0;
+  if (ordered.length < 2) {
+    throw new Error(
+      "Hydrostatic table must contain at least 2 draft/displacement entries."
+    );
   }
 
   if (meanDraftM <= ordered[0].draftM) {

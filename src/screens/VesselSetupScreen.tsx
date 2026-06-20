@@ -116,7 +116,7 @@ const [pdfName, setPdfName] = useState(vessel?.hydrostaticPdfName ?? hydrostatic
   label="Forward Draft Mark from FP (m)"
   value={forwardDraftMarkFromFP}
   onChangeText={setForwardDraftMarkFromFP}
-  keyboardType="decimal-pad"
+  keyboardType="numbers-and-punctuation"
   placeholder="5.0"
 />
 
@@ -124,7 +124,7 @@ const [pdfName, setPdfName] = useState(vessel?.hydrostaticPdfName ?? hydrostatic
   label="Aft Draft Mark from AP (m)"
   value={aftDraftMarkFromAP}
   onChangeText={setAftDraftMarkFromAP}
-  keyboardType="decimal-pad"
+  keyboardType="numbers-and-punctuation"
   placeholder="5.0"
 />
       </Card>

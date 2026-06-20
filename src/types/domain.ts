@@ -18,9 +18,8 @@ export interface Vessel {
 
   constantMt: number;
 
-  aftDraftMarkFromAP: number;
-
-  forwardDraftMarkFromFP: number;
+  aftDraftMarkFromAP: number; // + forward of AP, - abaft AP
+  forwardDraftMarkFromFP: number; // + abaft FP, - forward of FP
 
   lbp: number;
 
