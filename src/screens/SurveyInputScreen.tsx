@@ -66,15 +66,30 @@ export const SurveyInputScreen = ({ vessel, operation, onSave, onResults }: Prop
       Alert.alert("Check survey", "Enter all six drafts and dock water density.");
       return;
     }
-    const calculated = calculateCargoOnBoard(vessel, input);
-    onSave({
-      ...input,
-      ...calculated,
-      id: createId("survey"),
-      operationId: operation.id,
-      createdAt: new Date().toISOString()
-    });
-    setForm(initialForm());
+    try {
+  const calculated = calculateCargoOnBoard(vessel, input);
+
+  onSave({
+    ...input,
+    ...calculated,
+    id: createId("survey"),
+    operationId: operation.id,
+    createdAt: new Date().toISOString()
+  });
+
+  setForm(initialForm());
+
+} catch (error) {
+
+  Alert.alert(
+    "Hydrostatic Table Check",
+    error instanceof Error
+      ? error.message
+      : "Check drafts and hydrostatic table."
+  );
+
+  return;
+}
   };
 
   return (

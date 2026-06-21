@@ -96,13 +96,17 @@ export const interpolateDisplacement = (meanDraftM: number, table: HydrostaticEn
     );
   }
 
-  if (meanDraftM <= ordered[0].draftM) {
-    return ordered[0].displacementMt;
+  if (meanDraftM < ordered[0].draftM) {
+    throw new Error(
+      `Mean draft ${meanDraftM}m is below the minimum hydrostatic draft ${ordered[0].draftM}m`
+    );
   }
 
   const last = ordered[ordered.length - 1];
-  if (meanDraftM >= last.draftM) {
-    return last.displacementMt;
+  if (meanDraftM > last.draftM) {
+    throw new Error(
+      `Mean draft ${meanDraftM}m is above the maximum hydrostatic draft ${last.draftM}m`
+    );
   }
 
   for (let index = 0; index < ordered.length - 1; index += 1) {
