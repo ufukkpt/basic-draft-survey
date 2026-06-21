@@ -142,6 +142,7 @@ export default function App() {
           operation={operation}
           onSave={handleSaveSurvey}
           onResults={() => setRoute("results")}
+          onCheckHydrostatic={openHydrostaticEditor}
         />
       )}
       {route === "results" && operation && (

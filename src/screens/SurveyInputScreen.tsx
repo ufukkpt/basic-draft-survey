@@ -6,7 +6,7 @@ import { Screen } from "@/components/Screen";
 import { TextField } from "@/components/TextField";
 import { BodyText, SectionTitle, Title } from "@/components/Typography";
 import { calculateCargoOnBoard } from "@/services/calculations";
-import { Operation, Survey, SurveyInput, Vessel } from "@/types/domain";
+import { Operation, Survey, SurveyInput, Vessel, HydrostaticEntry } from "@/types/domain";
 import { decimal } from "@/utils/format";
 import { createId } from "@/utils/ids";
 
@@ -15,6 +15,7 @@ interface Props {
   operation: Operation;
   onSave: (survey: Survey) => void;
   onResults: () => void;
+  onCheckHydrostatic: (rows: HydrostaticEntry[], meta?: { fileName?: string; uri?: string }) => void;
 }
 
 type FormState = Record<keyof Omit<SurveyInput, "surveyedAt">, string> & { surveyedAt: string };
@@ -33,7 +34,7 @@ const initialForm = (): FormState => ({
   surveyedAt: new Date().toISOString()
 });
 
-export const SurveyInputScreen = ({ vessel, operation, onSave, onResults }: Props) => {
+export const SurveyInputScreen = ({ vessel, operation, onSave, onResults, onCheckHydrostatic }: Props) => {
   const [form, setForm] = useState<FormState>(initialForm);
 
   const setValue = (key: keyof FormState, value: string) => setForm((current) => ({ ...current, [key]: value }));
@@ -123,6 +124,16 @@ export const SurveyInputScreen = ({ vessel, operation, onSave, onResults }: Prop
       </Card>
 
       <Button label="Save Survey" onPress={save} />
+      <Button
+        label="Check Hydrostatic Table"
+        variant="secondary"
+        onPress={() =>
+          onCheckHydrostatic(vessel.hydrostaticTable, {
+            fileName: vessel.hydrostaticPdfName,
+            uri: vessel.hydrostaticPdfUri,
+          })
+        }
+      />
       <Button label="View Results" variant="secondary" onPress={onResults} />
     </Screen>
   );
