@@ -19,12 +19,26 @@ interface Props {
 export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Props) => {
   const [draftRows, setDraftRows] = useState(rows.length ? rows : []);
 
-  const updateRow = (id: string, key: "draftM" | "displacementMt", value: string) => {
+  const updateRow = (
+    id: string,
+    key: "draftM" | "displacementMt" | "tpc" | "mctc" | "lcf",
+    value: string
+  ) => {
     setDraftRows((current) => current.map((row) => (row.id === id ? { ...row, [key]: decimal(value) } : row)));
   };
 
   const addRow = () => {
-    setDraftRows((current) => [...current, { id: createId("hydro"), draftM: 0, displacementMt: 0 }]);
+    setDraftRows((current) => [
+      ...current,
+      {
+        id: createId("hydro"),
+        draftM: 0,
+        displacementMt: 0,
+        tpc: 0,
+        mctc: 0,
+        lcf: 0
+      }
+    ]);
   };
 
   const removeRow = (id: string) => {
@@ -61,6 +75,26 @@ export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Pr
               value={String(row.displacementMt || "")}
               onChangeText={(value) => updateRow(row.id, "displacementMt", value)}
               keyboardType="decimal-pad"
+            />
+            <TextField
+              label="TPC"
+              value={String(row.tpc || "")}
+              onChangeText={(value) => updateRow(row.id, "tpc", value)}
+              keyboardType="numbers-and-punctuation"
+            />
+
+            <TextField
+              label="MCTC"
+              value={String(row.mctc || "")}
+              onChangeText={(value) => updateRow(row.id, "mctc", value)}
+              keyboardType="numbers-and-punctuation"
+            />
+
+            <TextField
+              label="LCF"
+              value={String(row.lcf || "")}
+              onChangeText={(value) => updateRow(row.id, "lcf", value)}
+              keyboardType="numbers-and-punctuation"
             />
             <Button label="Remove Row" variant="danger" onPress={() => removeRow(row.id)} />
           </View>

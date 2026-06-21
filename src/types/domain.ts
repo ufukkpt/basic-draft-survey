@@ -37,6 +37,9 @@ export interface HydrostaticEntry {
   id: string;
   draftM: number;
   displacementMt: number;
+  tpc?: number;
+  mctc?: number;
+  lcf?: number;
 }
 
 export interface Operation {
