@@ -70,6 +70,7 @@ export interface Survey extends SurveyInput {
   operationId: string;
   meanDraftM: number;
   displacementMt: number;
+  tpc?: number;
   cargoOnBoardMt: number;
   createdAt: string;
 }

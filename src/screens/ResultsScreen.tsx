@@ -36,6 +36,10 @@ export const ResultsScreen = ({ operation, surveys, onAddSurvey, onHistory, onNe
             <MetricTile label="Current Cargo On Board" value={mt(latest.cargoOnBoardMt)} emphasis />
             <MetricTile label="Mean Draft" value={`${latest.meanDraftM.toFixed(3)} m`} />
             <MetricTile label="Displacement" value={mt(latest.displacementMt)} />
+            <MetricTile
+              label="TPC"
+              value={latest.tpc !== undefined ? String(latest.tpc) : "--"}
+            />
             <MetricTile label="Since Previous" value={mt(metrics?.previousChangeMt)} />
             <MetricTile label="Since Commencement" value={mt(metrics?.commencementChangeMt)} />
             <MetricTile label="Rate Since Previous" value={rate(metrics?.rateSincePreviousMtPerHour)} />
