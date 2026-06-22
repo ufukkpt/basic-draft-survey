@@ -40,6 +40,14 @@ export const ResultsScreen = ({ operation, surveys, onAddSurvey, onHistory, onNe
               label="TPC"
               value={latest.tpc !== undefined ? String(latest.tpc) : "--"}
             />
+            <MetricTile
+              label="LCF"
+              value={latest.lcf !== undefined ? String(latest.lcf) : "--"}
+            />
+            <MetricTile
+              label="MCTC"
+              value={latest.mctc !== undefined ? String(latest.mctc) : "--"}
+            />
             <MetricTile label="Since Previous" value={mt(metrics?.previousChangeMt)} />
             <MetricTile label="Since Commencement" value={mt(metrics?.commencementChangeMt)} />
             <MetricTile label="Rate Since Previous" value={rate(metrics?.rateSincePreviousMtPerHour)} />

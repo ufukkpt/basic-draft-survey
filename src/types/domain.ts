@@ -71,6 +71,8 @@ export interface Survey extends SurveyInput {
   meanDraftM: number;
   displacementMt: number;
   tpc?: number;
+  lcf?: number;
+  mctc?: number;
   cargoOnBoardMt: number;
   createdAt: string;
 }

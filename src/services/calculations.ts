@@ -149,6 +149,17 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
     vessel.hydrostaticTable,
     "tpc"
   );
+  const lcf = interpolateValue(
+    meanDraftM,
+    vessel.hydrostaticTable,
+    "lcf"
+  );
+
+  const mctc = interpolateValue(
+    meanDraftM,
+    vessel.hydrostaticTable,
+    "mctc"
+  );
   const displacementMt = correctDisplacementForDensity(hydrostaticDisplacement, input.dockWaterDensity);
   const cargoOnBoardMt =
     displacementMt -
@@ -162,6 +173,8 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
     meanDraftM,
     displacementMt,
     tpc,
+    lcf,
+    mctc,
     cargoOnBoardMt: round(cargoOnBoardMt, 2)
   };
 };
