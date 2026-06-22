@@ -88,7 +88,11 @@ export const calculateMeanDraft = (
     3
   );
 };
-export const interpolateDisplacement = (meanDraftM: number, table: HydrostaticEntry[]) => {
+export const interpolateValue = (
+  meanDraftM: number,
+  table: HydrostaticEntry[],
+  valueKey: keyof HydrostaticEntry
+) => {
   const ordered = [...table].sort((a, b) => a.draftM - b.draftM);
   if (ordered.length < 2) {
     throw new Error(
@@ -114,12 +118,24 @@ export const interpolateDisplacement = (meanDraftM: number, table: HydrostaticEn
     const upper = ordered[index + 1];
     if (meanDraftM >= lower.draftM && meanDraftM <= upper.draftM) {
       const ratio = (meanDraftM - lower.draftM) / (upper.draftM - lower.draftM);
-      return round(lower.displacementMt + ratio * (upper.displacementMt - lower.displacementMt), 2);
+      const lowerValue = Number(lower[valueKey] ?? 0);
+      const upperValue = Number(upper[valueKey] ?? 0);
+      return round(lowerValue + ratio * (upperValue - lowerValue), 2);
     }
   }
 
-  return last.displacementMt;
+  return Number(last[valueKey] ?? 0);
 };
+
+export const interpolateDisplacement = (
+  meanDraftM: number,
+  table: HydrostaticEntry[]
+) =>
+  interpolateValue(
+    meanDraftM,
+    table,
+    "displacementMt"
+  );
 
 export const correctDisplacementForDensity = (saltWaterDisplacementMt: number, dockWaterDensity: number) =>
   round(saltWaterDisplacementMt * (dockWaterDensity / SEA_WATER_DENSITY), 2);
@@ -128,6 +144,11 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
 
   const meanDraftM = calculateMeanDraft(input,vessel);
   const hydrostaticDisplacement = interpolateDisplacement(meanDraftM, vessel.hydrostaticTable);
+  const tpc = interpolateValue(
+    meanDraftM,
+    vessel.hydrostaticTable,
+    "tpc"
+  );
   const displacementMt = correctDisplacementForDensity(hydrostaticDisplacement, input.dockWaterDensity);
   const cargoOnBoardMt =
     displacementMt -
@@ -140,6 +161,7 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
   return {
     meanDraftM,
     displacementMt,
+    tpc,
     cargoOnBoardMt: round(cargoOnBoardMt, 2)
   };
 };
