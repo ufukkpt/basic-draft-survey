@@ -161,6 +161,24 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
     "mctc"
   );
   const displacementMt = correctDisplacementForDensity(hydrostaticDisplacement, input.dockWaterDensity);
+  const correctedDrafts = calculateCorrectedDrafts(
+    input,
+    vessel
+  );
+
+  const firstTrimCorrectionMt =
+    tpc && vessel.lbp
+      ? round(
+          (
+            correctedDrafts.trim *
+            (lcf ?? 0) *
+            tpc *
+            100
+          ) /
+          vessel.lbp,
+          2
+        )
+      : 0;
   const cargoOnBoardMt =
     displacementMt -
     vessel.lightshipWeightMt -
@@ -175,6 +193,7 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
     tpc,
     lcf,
     mctc,
+    firstTrimCorrectionMt,
     cargoOnBoardMt: round(cargoOnBoardMt, 2)
   };
 };

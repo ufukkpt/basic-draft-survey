@@ -48,6 +48,14 @@ export const ResultsScreen = ({ operation, surveys, onAddSurvey, onHistory, onNe
               label="MCTC"
               value={latest.mctc !== undefined ? String(latest.mctc) : "--"}
             />
+            <MetricTile
+              label="1st Trim Corr"
+              value={
+                latest.firstTrimCorrectionMt !== undefined
+                  ? `${latest.firstTrimCorrectionMt} MT`
+                  : "--"
+              }
+            />
             <MetricTile label="Since Previous" value={mt(metrics?.previousChangeMt)} />
             <MetricTile label="Since Commencement" value={mt(metrics?.commencementChangeMt)} />
             <MetricTile label="Rate Since Previous" value={rate(metrics?.rateSincePreviousMtPerHour)} />

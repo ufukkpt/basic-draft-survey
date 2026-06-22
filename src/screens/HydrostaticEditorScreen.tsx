@@ -9,6 +9,15 @@ import { HydrostaticEntry } from "@/types/domain";
 import { decimal } from "@/utils/format";
 import { createId } from "@/utils/ids";
 
+type EditableHydrostaticRow = {
+  id: string;
+  draftM: string;
+  displacementMt: string;
+  tpc: string;
+  mctc: string;
+  lcf: string;
+};
+
 interface Props {
   rows: HydrostaticEntry[];
   fileName?: string;
@@ -17,14 +26,25 @@ interface Props {
 }
 
 export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Props) => {
-  const [draftRows, setDraftRows] = useState(rows.length ? rows : []);
+  const [draftRows, setDraftRows] = useState<EditableHydrostaticRow[]>(
+    rows.map((r) => ({
+      id: r.id,
+      draftM: String(r.draftM ?? ""),
+      displacementMt: String(r.displacementMt ?? ""),
+      tpc: String(r.tpc ?? ""),
+      mctc: String(r.mctc ?? ""),
+      lcf: String(r.lcf ?? ""),
+    }))
+  );
 
   const updateRow = (
     id: string,
-    key: "draftM" | "displacementMt" | "tpc" | "mctc" | "lcf",
+    key: keyof Omit<EditableHydrostaticRow, "id">,
     value: string
   ) => {
-    setDraftRows((current) => current.map((row) => (row.id === id ? { ...row, [key]: decimal(value) } : row)));
+    setDraftRows((current) =>
+      current.map((row) => (row.id === id ? { ...row, [key]: value } : row))
+    );
   };
 
   const addRow = () => {
@@ -32,12 +52,12 @@ export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Pr
       ...current,
       {
         id: createId("hydro"),
-        draftM: 0,
-        displacementMt: 0,
-        tpc: 0,
-        mctc: 0,
-        lcf: 0
-      }
+        draftM: "",
+        displacementMt: "",
+        tpc: "",
+        mctc: "",
+        lcf: "",
+      },
     ]);
   };
 
@@ -46,11 +66,23 @@ export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Pr
   };
 
   const save = () => {
-    const cleanRows = draftRows
+    const cleanRows: HydrostaticEntry[] = draftRows
+      .map((r) => ({
+        id: r.id,
+        draftM: decimal(r.draftM),
+        displacementMt: decimal(r.displacementMt),
+        tpc: decimal(r.tpc),
+        mctc: decimal(r.mctc),
+        lcf: decimal(r.lcf),
+      }))
       .filter((row) => row.draftM > 0 && row.displacementMt > 0)
       .sort((a, b) => a.draftM - b.draftM);
+
     if (cleanRows.length === 0) {
-      Alert.alert("Hydrostatic table required", "Add at least one valid draft and displacement row.");
+      Alert.alert(
+        "Hydrostatic table required",
+        "Add at least one valid draft and displacement row."
+      );
       return;
     }
     onSave(cleanRows);
@@ -66,37 +98,41 @@ export const HydrostaticEditorScreen = ({ rows, fileName, onCancel, onSave }: Pr
           <View key={row.id} style={styles.row}>
             <TextField
               label={`Draft ${index + 1} (m)`}
-              value={String(row.draftM || "")}
+              value={row.draftM}
               onChangeText={(value) => updateRow(row.id, "draftM", value)}
               keyboardType="decimal-pad"
             />
             <TextField
               label="Displacement (MT)"
-              value={String(row.displacementMt || "")}
+              value={row.displacementMt}
               onChangeText={(value) => updateRow(row.id, "displacementMt", value)}
               keyboardType="decimal-pad"
             />
             <TextField
               label="TPC"
-              value={String(row.tpc || "")}
+              value={row.tpc}
               onChangeText={(value) => updateRow(row.id, "tpc", value)}
               keyboardType="numbers-and-punctuation"
             />
 
             <TextField
               label="MCTC"
-              value={String(row.mctc || "")}
+              value={row.mctc}
               onChangeText={(value) => updateRow(row.id, "mctc", value)}
               keyboardType="numbers-and-punctuation"
             />
 
             <TextField
               label="LCF"
-              value={String(row.lcf || "")}
+              value={row.lcf}
               onChangeText={(value) => updateRow(row.id, "lcf", value)}
               keyboardType="numbers-and-punctuation"
             />
-            <Button label="Remove Row" variant="danger" onPress={() => removeRow(row.id)} />
+            <Button
+              label="Remove Row"
+              variant="danger"
+              onPress={() => removeRow(row.id)}
+            />
           </View>
         ))}
         <Button label="Add Row" variant="secondary" onPress={addRow} />

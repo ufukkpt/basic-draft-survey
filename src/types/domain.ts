@@ -73,6 +73,7 @@ export interface Survey extends SurveyInput {
   tpc?: number;
   lcf?: number;
   mctc?: number;
+  firstTrimCorrectionMt?: number;
   cargoOnBoardMt: number;
   createdAt: string;
 }
