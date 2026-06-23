@@ -133,6 +133,17 @@ export const interpolateValue = (
   return Number(last[valueKey] ?? 0);
 };
 
+const calculateDmct = (meanDraftM: number, table: HydrostaticEntry[]) => {
+  const lowerDraft = Math.floor(meanDraftM);
+  const upperDraft = lowerDraft + 1;
+
+  const lowerMctc = interpolateValue(lowerDraft, table, "mctc");
+
+  const upperMctc = interpolateValue(upperDraft, table, "mctc");
+
+  return upperMctc - lowerMctc;
+};
+
 export const interpolateDisplacement = (
   meanDraftM: number,
   table: HydrostaticEntry[]
@@ -179,18 +190,29 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
   const firstTrimCorrectionMt =
     tpc && vessel.lbp
       ? round(
-          (
-            correctedDrafts.trim *
-            (lcf ?? 0) *
-            tpc *
-            100
-          ) /
-          vessel.lbp,
+          (correctedDrafts.trim * (lcf ?? 0) * tpc * 100) / vessel.lbp,
           2
         )
       : 0;
+
+  const dmct = calculateDmct(meanDraftM, vessel.hydrostaticTable);
+
+  const secondTrimCorrectionMt = vessel.lbp
+    ? round((Math.pow(corrected.trim, 2) * 50 * dmct) / vessel.lbp, 2)
+    : 0;
+
+  const trimCorrectedDisplacementMt =
+    hydrostaticDisplacement +
+    firstTrimCorrectionMt +
+    secondTrimCorrectionMt;
+
+  const finalDisplacementMt = correctDisplacementForDensity(
+    trimCorrectedDisplacementMt,
+    input.dockWaterDensity
+  );
+
   const cargoOnBoardMt =
-    displacementMt -
+    finalDisplacementMt -
     vessel.lightshipWeightMt -
     vessel.constantMt -
     input.ballastMt -
@@ -200,11 +222,14 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
   return {
     meanDraftM,
     ...corrected,
-    displacementMt,
+    displacementMt: finalDisplacementMt,
+    trimCorrectedDisplacementMt,
+    finalDisplacementMt,
     tpc,
     lcf,
     mctc,
     firstTrimCorrectionMt,
+    secondTrimCorrectionMt,
     cargoOnBoardMt: round(cargoOnBoardMt, 2)
   };
 };

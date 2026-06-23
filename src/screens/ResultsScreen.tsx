@@ -71,10 +71,34 @@ export const ResultsScreen = ({ operation, surveys, onAddSurvey, onHistory, onNe
               value={latest.trim !== undefined ? `${latest.trim} m` : "--"}
             />
             <MetricTile
+              label="Trim Corr Disp"
+              value={
+                latest.trimCorrectedDisplacementMt !== undefined
+                  ? `${latest.trimCorrectedDisplacementMt} MT`
+                  : "--"
+              }
+            />
+            <MetricTile
+              label="Final Disp"
+              value={
+                latest.finalDisplacementMt !== undefined
+                  ? `${latest.finalDisplacementMt} MT`
+                  : "--"
+              }
+            />
+            <MetricTile
               label="1st Trim Corr"
               value={
                 latest.firstTrimCorrectionMt !== undefined
                   ? `${latest.firstTrimCorrectionMt} MT`
+                  : "--"
+              }
+            />
+            <MetricTile
+              label="2nd Trim Corr"
+              value={
+                latest.secondTrimCorrectionMt !== undefined
+                  ? `${latest.secondTrimCorrectionMt} MT`
                   : "--"
               }
             />
