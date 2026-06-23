@@ -49,6 +49,28 @@ export const ResultsScreen = ({ operation, surveys, onAddSurvey, onHistory, onNe
               value={latest.mctc !== undefined ? String(latest.mctc) : "--"}
             />
             <MetricTile
+              label="Corr Fwd"
+              value={
+                latest.correctedForwardDraft !== undefined
+                  ? `${latest.correctedForwardDraft} m`
+                  : "--"
+              }
+            />
+
+            <MetricTile
+              label="Corr Aft"
+              value={
+                latest.correctedAftDraft !== undefined
+                  ? `${latest.correctedAftDraft} m`
+                  : "--"
+              }
+            />
+
+            <MetricTile
+              label="Trim"
+              value={latest.trim !== undefined ? `${latest.trim} m` : "--"}
+            />
+            <MetricTile
               label="1st Trim Corr"
               value={
                 latest.firstTrimCorrectionMt !== undefined

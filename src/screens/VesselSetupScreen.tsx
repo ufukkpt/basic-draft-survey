@@ -28,6 +28,9 @@ const [forwardDraftMarkFromFP, setForwardDraftMarkFromFP] = useState(
 const [aftDraftMarkFromAP, setAftDraftMarkFromAP] = useState(
   vessel?.aftDraftMarkFromAP?.toString() ?? ""
 );
+const [midshipDraftMarkFromMidship, setMidshipDraftMarkFromMidship] = useState(
+  vessel?.midshipDraftMarkFromMidship?.toString() ?? ""
+);
 const [pdfName, setPdfName] = useState(vessel?.hydrostaticPdfName ?? hydrostaticDraft?.fileName);
   const [pdfUri, setPdfUri] = useState(vessel?.hydrostaticPdfUri ?? hydrostaticDraft?.uri);
   const [hydrostaticTable, setHydrostaticTable] = useState<HydrostaticEntry[]>(
@@ -74,6 +77,7 @@ const [pdfName, setPdfName] = useState(vessel?.hydrostaticPdfName ?? hydrostatic
     lbp: decimal(lbp),
     forwardDraftMarkFromFP: decimal(forwardDraftMarkFromFP),
     aftDraftMarkFromAP: decimal(aftDraftMarkFromAP),
+    midshipDraftMarkFromMidship: decimal(midshipDraftMarkFromMidship),
       hydrostaticPdfName: pdfName,
       hydrostaticPdfUri: pdfUri,
       hydrostaticTable,
@@ -126,6 +130,14 @@ const [pdfName, setPdfName] = useState(vessel?.hydrostaticPdfName ?? hydrostatic
   onChangeText={setAftDraftMarkFromAP}
   keyboardType="numbers-and-punctuation"
   placeholder="5.0"
+/>
+
+<TextField
+  label="Midship Draft Mark from Midship (m)"
+  value={midshipDraftMarkFromMidship}
+  onChangeText={setMidshipDraftMarkFromMidship}
+  keyboardType="numbers-and-punctuation"
+  placeholder="0.0"
 />
       </Card>
 

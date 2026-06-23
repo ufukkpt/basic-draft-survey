@@ -20,6 +20,7 @@ export interface Vessel {
 
   aftDraftMarkFromAP: number; // + forward of AP, - abaft AP
   forwardDraftMarkFromFP: number; // + abaft FP, - forward of FP
+  midshipDraftMarkFromMidship: number; // + abaft midship, - forward of midship
 
   lbp: number;
 
@@ -74,6 +75,9 @@ export interface Survey extends SurveyInput {
   lcf?: number;
   mctc?: number;
   firstTrimCorrectionMt?: number;
+  correctedForwardDraft?: number;
+  correctedAftDraft?: number;
+  trim?: number;
   cargoOnBoardMt: number;
   createdAt: string;
 }

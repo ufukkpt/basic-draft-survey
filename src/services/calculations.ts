@@ -28,13 +28,13 @@ export const calculateCorrectedDrafts = (
 ) => {
   const forwardMean = (input.forwardPort + input.forwardStarboard) / 2;
   const aftMean = (input.aftPort + input.aftStarboard) / 2;
-  const trim = aftMean - forwardMean;
+  const observedTrim = aftMean - forwardMean;
 
   const correctedForwardDraft = calculateDraftAtPerpendicular(
     forwardMean,
     vessel.forwardDraftMarkFromFP,
     vessel.lbp,
-    trim,
+    observedTrim,
     "FP"
   );
 
@@ -42,14 +42,16 @@ export const calculateCorrectedDrafts = (
     aftMean,
     vessel.aftDraftMarkFromAP,
     vessel.lbp,
-    trim,
+    observedTrim,
     "AP"
   );
+
+  const correctedTrim = correctedAftDraft - correctedForwardDraft;
 
   return {
     correctedForwardDraft: round(correctedForwardDraft, 3),
     correctedAftDraft: round(correctedAftDraft, 3),
-    trim: round(trim, 3),
+    trim: round(correctedTrim, 3),
   };
 };
 
@@ -83,8 +85,12 @@ export const calculateMeanDraft = (
     "AP"
   );
 
+  const correctedMidship =
+    midshipMean +
+    (vessel.midshipDraftMarkFromMidship / vessel.lbp) * trim;
+
   return round(
-    (correctedForward + 6 * midshipMean + correctedAft) / 8,
+    (correctedForward + 6 * correctedMidship + correctedAft) / 8,
     3
   );
 };
@@ -142,8 +148,12 @@ export const correctDisplacementForDensity = (saltWaterDisplacementMt: number, d
 
 export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
 
-  const meanDraftM = calculateMeanDraft(input,vessel);
-  const hydrostaticDisplacement = interpolateDisplacement(meanDraftM, vessel.hydrostaticTable);
+  const meanDraftM = calculateMeanDraft(input, vessel);
+  const corrected = calculateCorrectedDrafts(input, vessel);
+  const hydrostaticDisplacement = interpolateDisplacement(
+    meanDraftM,
+    vessel.hydrostaticTable
+  );
   const tpc = interpolateValue(
     meanDraftM,
     vessel.hydrostaticTable,
@@ -189,6 +199,7 @@ export const calculateCargoOnBoard = (vessel: Vessel, input: SurveyInput) => {
 
   return {
     meanDraftM,
+    ...corrected,
     displacementMt,
     tpc,
     lcf,
