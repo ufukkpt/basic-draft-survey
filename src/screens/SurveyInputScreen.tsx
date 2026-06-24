@@ -18,40 +18,70 @@ interface Props {
   onCheckHydrostatic: (rows: HydrostaticEntry[], meta?: { fileName?: string; uri?: string }) => void;
 }
 
-type FormState = Record<keyof Omit<SurveyInput, "surveyedAt">, string> & { surveyedAt: string };
+type FormState = Record<keyof Omit<SurveyInput, "surveyedAt">, string> & {
+  date: string;
+  time: string;
+};
 
-const initialForm = (): FormState => ({
-  forwardPort: "",
-  forwardStarboard: "",
-  midshipPort: "",
-  midshipStarboard: "",
-  aftPort: "",
-  aftStarboard: "",
-  dockWaterDensity: "1.025",
-  ballastMt: "0",
-  freshWaterMt: "0",
-  fuelMt: "0",
-  surveyedAt: new Date().toISOString()
-});
+const initialForm = (): FormState => {
+  const now = new Date();
+  return {
+    forwardPort: "",
+    forwardStarboard: "",
+    midshipPort: "",
+    midshipStarboard: "",
+    aftPort: "",
+    aftStarboard: "",
+    dockWaterDensity: "1.025",
+    ballastMt: "0",
+    freshWaterMt: "0",
+    fuelMt: "0",
+    date: now.toLocaleDateString("en-GB"),
+    time: now.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+};
 
-export const SurveyInputScreen = ({ vessel, operation, onSave, onResults, onCheckHydrostatic }: Props) => {
+export const SurveyInputScreen = ({
+  vessel,
+  operation,
+  onSave,
+  onResults,
+  onCheckHydrostatic,
+}: Props) => {
   const [form, setForm] = useState<FormState>(initialForm);
 
-  const setValue = (key: keyof FormState, value: string) => setForm((current) => ({ ...current, [key]: value }));
+  const setValue = (key: keyof FormState, value: string) =>
+    setForm((current) => ({ ...current, [key]: value }));
 
-  const buildInput = (): SurveyInput => ({
-    forwardPort: decimal(form.forwardPort),
-    forwardStarboard: decimal(form.forwardStarboard),
-    midshipPort: decimal(form.midshipPort),
-    midshipStarboard: decimal(form.midshipStarboard),
-    aftPort: decimal(form.aftPort),
-    aftStarboard: decimal(form.aftStarboard),
-    dockWaterDensity: decimal(form.dockWaterDensity),
-    ballastMt: decimal(form.ballastMt),
-    freshWaterMt: decimal(form.freshWaterMt),
-    fuelMt: decimal(form.fuelMt),
-    surveyedAt: form.surveyedAt
-  });
+  const buildInput = (): SurveyInput => {
+    const [day, month, year] = form.date.split("/");
+    const [hours, minutes] = form.time.split(":");
+
+    const surveyedAt = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours),
+      Number(minutes)
+    ).toISOString();
+
+    return {
+      forwardPort: decimal(form.forwardPort),
+      forwardStarboard: decimal(form.forwardStarboard),
+      midshipPort: decimal(form.midshipPort),
+      midshipStarboard: decimal(form.midshipStarboard),
+      aftPort: decimal(form.aftPort),
+      aftStarboard: decimal(form.aftStarboard),
+      dockWaterDensity: decimal(form.dockWaterDensity),
+      ballastMt: decimal(form.ballastMt),
+      freshWaterMt: decimal(form.freshWaterMt),
+      fuelMt: decimal(form.fuelMt),
+      surveyedAt,
+    };
+  };
 
   const save = () => {
     const input = buildInput();
@@ -120,7 +150,16 @@ export const SurveyInputScreen = ({ vessel, operation, onSave, onResults, onChec
 
       <Card>
         <SectionTitle>Survey Time</SectionTitle>
-        <TextField label="Survey Date and Time" value={form.surveyedAt} onChangeText={(value) => setValue("surveyedAt", value)} />
+        <TextField
+          label="Survey Date (DD/MM/YYYY)"
+          value={form.date}
+          onChangeText={(value) => setValue("date", value)}
+        />
+        <TextField
+          label="Survey Time (HH:mm)"
+          value={form.time}
+          onChangeText={(value) => setValue("time", value)}
+        />
       </Card>
 
       <Button label="Save Survey" onPress={save} />

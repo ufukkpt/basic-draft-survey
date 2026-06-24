@@ -53,6 +53,21 @@ export const saveSurvey = async (survey: Survey) => {
   return nextState;
 };
 
+export const deleteSurvey = async (surveyId: string) => {
+  const state = await loadState();
+
+  const surveys = state.surveys.filter((survey) => survey.id !== surveyId);
+
+  const nextState = {
+    ...state,
+    surveys,
+  };
+
+  await saveState(nextState);
+
+  return nextState;
+};
+
 export const clearAllData = async () => {
   await AsyncStorage.removeItem(STORAGE_KEY);
 };

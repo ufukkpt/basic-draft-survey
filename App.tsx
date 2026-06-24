@@ -4,13 +4,14 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { colors } from "@/theme/colors";
 import { DraftTrackerState, HydrostaticEntry, Operation, Survey, Vessel } from "@/types/domain";
-import { loadState, saveOperation, saveState, saveSurvey, saveVessel } from "@/services/storage";
+import { deleteSurvey, loadState, saveOperation, saveState, saveSurvey, saveVessel } from "@/services/storage";
 import { VesselSetupScreen } from "@/screens/VesselSetupScreen";
 import { HydrostaticEditorScreen } from "@/screens/HydrostaticEditorScreen";
 import { StartOperationScreen } from "@/screens/StartOperationScreen";
 import { SurveyInputScreen } from "@/screens/SurveyInputScreen";
 import { ResultsScreen } from "@/screens/ResultsScreen";
 import { HistoryScreen } from "@/screens/HistoryScreen";
+import { SurveyDetailsScreen } from "@/screens/SurveyDetailsScreen";
 
 type Route = "vessel" | "hydrostatic" | "start" | "survey" | "results" | "history";
 
@@ -25,6 +26,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>("vessel");
   const [loading, setLoading] = useState(true);
   const [hydrostaticDraft, setHydrostaticDraft] = useState<HydrostaticDraft>({ rows: [] });
+  const [selectedSurvey, setSelectedSurvey] = useState<Survey | undefined>();
 
   useEffect(() => {
     loadState()
@@ -79,6 +81,12 @@ export default function App() {
     const nextState = await saveSurvey(survey);
     setState(nextState);
     setRoute("results");
+  };
+
+  const handleDeleteSurvey = async (surveyId: string) => {
+    const nextState = await deleteSurvey(surveyId);
+    setState(nextState);
+    setSelectedSurvey(undefined);
   };
 
   const handleResetOperation = () => {
@@ -154,8 +162,15 @@ export default function App() {
           onNewOperation={handleResetOperation}
         />
       )}
-      {route === "history" && operation && (
-        <HistoryScreen operation={operation} surveys={state.surveys} onBack={() => setRoute("results")} />
+      {selectedSurvey && (
+        <SurveyDetailsScreen
+          survey={selectedSurvey}
+          onBack={() => setSelectedSurvey(undefined)}
+          onDelete={handleDeleteSurvey}
+        />
+      )}
+      {route === "history" && operation && !selectedSurvey && (
+        <HistoryScreen operation={operation} surveys={state.surveys} onBack={() => setRoute("results")} onSelectSurvey={setSelectedSurvey} />
       )}
       {route === "start" && !vessel && (
         <VesselSetupScreen

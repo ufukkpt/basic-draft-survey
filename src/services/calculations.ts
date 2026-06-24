@@ -268,8 +268,17 @@ export const calculateSurveyMetrics = (
     };
   }
 
-  const remainingCargoMt = round(Math.max(operation.targetCargoMt - commencementChangeMt, 0), 2);
-  const operationProgressPct = round(Math.min(Math.max((commencementChangeMt / operation.targetCargoMt) * 100, 0), 100), 1);
+  const remainingCargoMt = round(
+    Math.max(operation.targetCargoMt - survey.cargoOnBoardMt, 0),
+    2
+  );
+  const operationProgressPct = round(
+    Math.min(
+      Math.max((survey.cargoOnBoardMt / operation.targetCargoMt) * 100, 0),
+      100
+    ),
+    1
+  );
   const usableRate = rateSincePreviousMtPerHour && rateSincePreviousMtPerHour > 0
     ? rateSincePreviousMtPerHour
     : averageRateMtPerHour;

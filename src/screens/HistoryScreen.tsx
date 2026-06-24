@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Screen } from "@/components/Screen";
@@ -11,9 +11,10 @@ interface Props {
   operation: Operation;
   surveys: Survey[];
   onBack: () => void;
+  onSelectSurvey: (survey: Survey) => void;
 }
 
-export const HistoryScreen = ({ operation, surveys, onBack }: Props) => (
+export const HistoryScreen = ({ operation, surveys, onBack, onSelectSurvey }: Props) => (
   <Screen>
     <Title>History</Title>
     <BodyText muted>Chronological survey log stored locally on this device.</BodyText>
@@ -27,15 +28,17 @@ export const HistoryScreen = ({ operation, surveys, onBack }: Props) => (
       surveys.map((survey, index) => {
         const metrics = calculateSurveyMetrics(survey, surveys, operation);
         return (
-          <Card key={survey.id}>
-            <View style={styles.header}>
-              <SectionTitle>Survey {index + 1}</SectionTitle>
-              <BodyText muted>{dateTime(survey.surveyedAt)}</BodyText>
-            </View>
-            <BodyText>Cargo On Board: {mt(survey.cargoOnBoardMt)}</BodyText>
-            <BodyText>Change Since Previous: {mt(metrics.previousChangeMt)}</BodyText>
-            <BodyText>Change Since Commencement: {mt(metrics.commencementChangeMt)}</BodyText>
-          </Card>
+          <Pressable key={survey.id} onPress={() => onSelectSurvey(survey)}>
+            <Card>
+              <View style={styles.header}>
+                <SectionTitle>Survey {index + 1}</SectionTitle>
+                <BodyText muted>{dateTime(survey.surveyedAt)}</BodyText>
+              </View>
+              <BodyText>Cargo On Board: {mt(survey.cargoOnBoardMt)}</BodyText>
+              <BodyText>Change Since Previous: {mt(metrics.previousChangeMt)}</BodyText>
+              <BodyText>Change Since Commencement: {mt(metrics.commencementChangeMt)}</BodyText>
+            </Card>
+          </Pressable>
         );
       })
     )}
